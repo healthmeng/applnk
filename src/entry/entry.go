@@ -11,7 +11,6 @@ import (
 	"strconv"
 )
 
-var fhandle http.Handler
 
 type GoodsInfo struct{
 	Name string
@@ -250,22 +249,6 @@ func modify(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func codes(w http.ResponseWriter, r *http.Request){
-	ck,_:=r.Cookie("logname")
-	if ck==nil {
-		http.Redirect(w, r, "/",http.StatusFound)
-	}else{
-		if ck.Value!="mdd"{
-			fmt.Fprintf(w,"请使用正确的用户登录后访问本页面\n")
-		}else{
-		h:=w.Header()
-		h.Add("Pragma","no-cache")
-		h.Add("Cache-Control","no-cache")
-		fhandle.ServeHTTP(w,r)
-		}
-	}
-}
-
 func applnk(w http.ResponseWriter, r* http.Request){
     if r.Method == "GET" {
         t, _ := template.ParseFiles("applnk.tpl")
@@ -277,7 +260,7 @@ func logon(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		t, _ := template.ParseFiles("a.test")
 		t.Execute(w, nil)
-	} else {
+	} /*else {
 		r.ParseForm()
 		psw := r.Form["password"][0]
 		user := r.Form["username"][0]
@@ -286,7 +269,7 @@ func logon(w http.ResponseWriter, r *http.Request) {
 			//			fmt.Fprintf(w,"OK!\n")
 			ck:=http.Cookie{Name:"logname",Value:"mdd"}
             http.SetCookie(w,&ck)
-            http.Redirect(w, r, "codes/", http.StatusFound)
+     //       http.Redirect(w, r, "codes/", http.StatusFound)
 		} else if psw == "34345789" && user == "xd" {
 			ck:=http.Cookie{Name:"logname",Value:"xd"}
 			http.SetCookie(w,&ck)
@@ -295,13 +278,11 @@ func logon(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "<font size= 20> 哼哼，用户名/密码不对哦~~~</font>")
 			fmt.Fprintln(w, "<script> alert(\"小样，去死吧!\")</script>")
 		}
-	}
+	}*/
 }
 
 func main() {
-	http.HandleFunc("/", logon)
-	//	h:=http.FileServer(http.Dir("."))
-	//http.HandleFunc("/",mainpage)
+	http.HandleFunc("/",logon)
 	http.HandleFunc("/applinks", applnk)
 	err := http.ListenAndServe(":8904", nil)
 	if err != nil {

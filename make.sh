@@ -1,3 +1,3 @@
 export GOPATH=`pwd`
-go install entry 
+go install  -gcflags "-N"  entry
  
