@@ -2,13 +2,13 @@ package dbop
 
 import (
 "database/sql"
-"strings"
+_"strings"
 "log"
 "os"
 "errors"
 "fmt"
 _"github.com/Go-SQL-Driver/MySQL"
-"time"
+_"time"
 )
 
 var db *sql.DB
@@ -16,13 +16,14 @@ var db *sql.DB
 type AppInfo struct{
 	ID int64
 	Name string
-	Vesion string
+	Version string
 	Vender string
-	Descr string
 	Url string
-	cost float64
-	sell float64
-	online int64
+	Descr string
+	Icon string
+	Cost float64
+	Sell float64
+	Online int64
 }
 
 type StoreInfo struct{ // one table for each user
@@ -35,81 +36,18 @@ type StoreInfo struct{ // one table for each user
 type TrackInfo struct{
 	StoreID int64
 	AppID int64
-	Time string
+	RegTime string
 }
 
 func init(){
 	var err error
-	db,err=sql.Open("mysql","applnk:2huoyige;@tcp(123.206.55.31:3306)/applnk")
+	db,err=sql.Open("mysql","applnk:2huoyige@tcp(123.206.55.31:3306)/applnk")
 	if err!=nil{
 		log.Println("Open database error:",err)
 		os.Exit(1)
 	}
 }
-
-func (info* UserInfo)ConfirmMsg(msgid int64)error{
-	query:=fmt.Sprintf("update msg%d set arrived=1 where msgid=%d",info.UID,msgid)
-	_,err:=db.Exec(query)
-	if err!=nil{
-		log.Println("update msgdb error:",err)
-	}
-	return err
-}
-
-func (info* UserInfo)RegisterMsg(msginfo *MsgInfo) error{
-	msgtb:=fmt.Sprintf("msg%d",msginfo.ToUID)
-	var query string
-	if msginfo.Type==TypeTxt{
-		tmp,_:=convgbk.GB2UTF(msginfo.Content)
-		query=fmt.Sprintf("insert into %s (type,content,fromuid,arrived,svrstamp) values (%d,'%s',%d,%d,'%s')",msgtb,msginfo.Type,tmp,msginfo.FromUID,0,msginfo.SvrStamp)
-	}else {
-		query=fmt.Sprintf("insert into %s (type,content,fromuid,arrived,svrstamp) values (%d,'%s',%d,%d,'%s')",msgtb,msginfo.Type,msginfo.Content,msginfo.FromUID,0,msginfo.SvrStamp)
-	}
-	query=strings.Replace(query,"\\","\\\\",-1)
-	if result,err:=db.Exec(query);err!=nil{
-		log.Println("Register message error:",err)
-		return err
-	}else{
-		msginfo.MsgID,_=result.LastInsertId()
-		return nil
-	}
-}
-
-func (info* UserInfo)GetUnsentMsg()([]MsgInfo,error){
-	msgtb:=fmt.Sprintf("msg%d",info.UID)
-	query:=fmt.Sprintf("select * from %s where arrived=0",msgtb)
-	msgs:=make([]MsgInfo,0,20)
-	res,err:=db.Query(query)
-	if err!=nil{
-		log.Println("Query messages error")
-		return nil,err
-	}
-	for ;res.Next();{
-		var msg MsgInfo
-		err:=res.Scan(&msg.MsgID,&msg.Type,&msg.Content,&msg.FromUID,
-					&msg.Arrived,&msg.SvrStamp)
-		if err!=nil{
-			log.Println("Parse db message error:",err)
-			return nil,err
-		}
-		if msg.Type==TypeTxt{
-			msg.Content,_=convgbk.UTF2GB(msg.Content)
-		}
-		msg.ToUID=info.UID
-		msgs=append(msgs,msg)
-	}
-	return msgs,nil
-}
-
-func (info* UserInfo)LoadInfo() error{
-	dbinfo,_:=FindUser(info.Username)
-	if dbinfo!=nil{
-		*info=*dbinfo
-		return nil
-	} else{
-		return errors.New("LoadInfo: user not found")
-	}
-}
+/*
 
 func (info* UserInfo)SaveInfo() error{
 	dbinfo,_:=FindUser(info.Username)
@@ -125,7 +63,7 @@ func (info* UserInfo)SaveInfo() error{
 	return nil
 }
 
-func FindUser(username string) (* UserInfo,error){
+func FindStoreName(username string) ([]* StoreInfo,error){
 	query:=fmt.Sprintf("select * from users where username='%s'",username)
 	res,err:=db.Query(query)
 	if err!=nil{
@@ -144,6 +82,7 @@ func FindUser(username string) (* UserInfo,error){
 	}
 	return nil,nil
 }
+
 
 func ListUsers()([]*UserInfo,error){
 	ret:=make([]*UserInfo,0,20)
@@ -165,20 +104,19 @@ func ListUsers()([]*UserInfo,error){
 		}
 	}
 	return ret,nil
-}
+}*/
 
-func LookforUID(uid int64) (* UserInfo,error){
-	query:=fmt.Sprintf("select * from users where uid='%d'",uid)
+func FindStoreID(id int64) (* StoreInfo,error){
+	query:=fmt.Sprintf("select * from stores where id='%d'",id)
 	res,err:=db.Query(query)
 	if err!=nil{
-		log.Println("find user query error:",err)
+		log.Println("find store query error:",err)
 		return nil,err
 	}
 	if res.Next(){
-		info:=new(UserInfo)
-		if err:=res.Scan(&info.UID,	&info.Username,
-				&info.Password,&info.Descr,&info.Face,
-				&info.Phone,&info.RegTime);err!=nil{
+		info:=new(StoreInfo)
+		if err:=res.Scan(&info.ID,	&info.Name,
+				&info.Level, &info.Descr);err!=nil{
 			log.Println("Query error:",err)
 			return nil,err
 		}
@@ -187,6 +125,63 @@ func LookforUID(uid int64) (* UserInfo,error){
 	return nil,nil
 }
 
+func FindApp(id int64) (* AppInfo,error){
+	query:=fmt.Sprintf("select * from apps where id='%d'",id)
+	res,err:=db.Query(query)
+	if err!=nil{
+		log.Println("find store query error:",err)
+		return nil,err
+	}
+	if res.Next(){
+		info:=new(AppInfo)
+		if err:=res.Scan(&info.ID,	&info.Name,
+				&info.Version, &info.Vender, &info.Url, &info.Descr,
+				&info.Icon,&info.Cost,&info.Sell, &info.Online);err!=nil{
+			log.Println("Query error:",err)
+			return nil,err
+		}
+		return info,nil
+	}
+	return nil,nil
+}
+
+func (info* TrackInfo)RegisterVisit() error{
+/*    tm:=time.Now().Local()
+    info.RegTime=fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tm.Year(), tm.Month(), tm.Day(), tm.Hour(), tm.Minute(), tm.Second())*/
+    query:=fmt.Sprintf("insert into tracks (storeid, appid) values (%d,%d)",info.StoreID,info.AppID)
+    if _,err:=db.Exec(query);err!=nil{
+        log.Println("Insert db error:",err)
+        return err
+    }
+	return nil
+}
+
+func GetAllApps(storeid int64)([]*AppInfo,error){
+	if storeid<1000{
+		return nil,errors.New("Invalid storeid")
+	}
+	ret:=make([]*AppInfo,0,50)
+	query:="select * from apps"
+	res,err:=db.Query(query)
+	if err!=nil{
+		log.Println("Query all apps error:",err)
+		return nil,err
+	}
+	for res.Next(){
+		info:=new(AppInfo)
+		if err:=res.Scan(&info.ID,	&info.Name,
+				&info.Version, &info.Vender,&info.Url,
+				 &info.Descr,&info.Icon,
+				&info.Cost,&info.Sell, &info.Online);err!=nil{
+			log.Println("Get object from db result  error:",err)
+			return nil,err
+		}else{
+			ret=append(ret,info)
+		}
+	}
+	return ret,nil
+}
+/*
 func AddUser(info *UserInfo) error{
 //	return nil
 // Add user info in db,add user msg table in db
@@ -231,4 +226,4 @@ func DelUser(name string, passwd string)error{
 	query=fmt.Sprintf("drop table if exists msg%d",info.UID)
 	db.Exec(query)
 	return nil
-}
+}*/

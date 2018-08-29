@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"os"
 	"strconv"
+	"dbop"
 )
 
 
@@ -25,6 +26,11 @@ type DataInfo struct{
 	HELPXD string
 	//HELPSHD string
 	Goods []* GoodsInfo
+}
+
+type Store struct{
+	StoreName string
+	StoreID int64
 }
 
 func LoadPrices(sel string)([]*GoodsInfo, int){
@@ -199,6 +205,8 @@ func xdinfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+
 func modify(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		curxd := 0
@@ -249,18 +257,74 @@ func modify(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ListApps(storeid int64) interface{}{
+	str:=""
+	applist,_:=dbop.GetAllApps(storeid)
+	for _,app:=range applist{
+		str+=fmt.Sprintf("<img src=\"%s\"  weight=\"48\" height=\"48\"/> <a target=\"_blank\" class=\"linkto\" href=\"/download?appid=%d&storeid=%d\"><font style=\"font-size:44px;vertical-align: top;\">%s</font></a>\n</p>",app.Icon,app.ID,storeid,app.Name)
+	}
+/*
+	str:="<img src=\"http://p2.img.cctvpic.com/nettv/newgame/cdn_pic/3212/mzl.fstobfap.png\"  weight=\"48\" height=\"48\"/> <a target=\"_blank\" class=\"linkto\" href=\"http://down2.uc.cn/amap/down.php?id=201&CustomID=C01110001449\"><font style=\"font-size:44px;vertical-align: top;\">高德地图</font></a>";
+//	str+=fmt.Sprintf("%d",id)
+	id=1*/
+
+	return template.HTML(str)
+}
+
 func applnk(w http.ResponseWriter, r* http.Request){
     if r.Method == "GET" {
-        t, _ := template.ParseFiles("applnk.tpl")
-        t.Execute(w, nil)
+		var info * dbop.StoreInfo=nil
+		r.ParseForm()
+		param:=r.Form.Get("storeid")
+		if param!=""{
+			if idnum,err:=strconv.ParseInt(param,10,64);err==nil{
+				info,_=dbop.FindStoreID(idnum)
+			}
+		}
+		if info==nil{
+			fmt.Fprintf(w,"门店信息不存在\n")
+		}else{
+			tpfunc:=make(template.FuncMap)
+			tpfunc["ListApps"]=ListApps
+			t:=template.New("applnk.tpl")
+			t=t.Funcs(tpfunc)
+			t, err:= t.ParseFiles("applnk.tpl")
+			if err!=nil{
+				panic(err)
+			}
+			store:=Store{
+				StoreName:info.Name,
+				StoreID: info.ID,
+			}
+			t.Execute(w, store)
+		}
     }
 }
 
+func download(w http.ResponseWriter, r *http.Request) {
+	//http.Redirect(w, r, "http://storage.360buyimg.com/build-cms/V7.1.0.61272_T2_oem-szhuoyou16.apk",http.StatusFound)
+	r.ParseForm()
+//	var appinfo *dbop.AppInfo=nil
+	store:=r.Form.Get("storeid")
+	app:=r.Form.Get("appid")
+	if store!="" && app!=""{
+		appid,err1:=strconv.ParseInt(app,10,64)
+		storeid,err2:=strconv.ParseInt(store,10,64)
+		if(err1==nil && err2==nil){
+			if appInfo,err:=dbop.FindApp(appid);err==nil{
+				track:=&dbop.TrackInfo{StoreID:storeid,AppID:appid}
+				track.RegisterVisit()
+				http.Redirect(w,r,appInfo.Url,http.StatusFound)
+			}
+		}
+	}
+}
+
 func logon(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+/*	if r.Method == "GET" {
 		t, _ := template.ParseFiles("a.test")
 		t.Execute(w, nil)
-	} /*else {
+	} else {
 		r.ParseForm()
 		psw := r.Form["password"][0]
 		user := r.Form["username"][0]
@@ -282,8 +346,9 @@ func logon(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/",logon)
+	http.HandleFunc("/",applnk)
 	http.HandleFunc("/applinks", applnk)
+	http.HandleFunc("/download",download);
 	err := http.ListenAndServe(":8904", nil)
 	if err != nil {
 		fmt.Printf("Error:", err)
