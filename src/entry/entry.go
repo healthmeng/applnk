@@ -261,7 +261,7 @@ func ListApps(storeid int64) interface{}{
 	str:=""
 	applist,_:=dbop.GetAllApps(storeid)
 	for _,app:=range applist{
-		str+=fmt.Sprintf("<img src=\"%s\"  weight=\"48\" height=\"48\"/> <a target=\"_blank\" class=\"linkto\" href=\"/download?appid=%d&storeid=%d\"><font style=\"font-size:44px;vertical-align: top;\">%s</font></a>\n</p>",app.Icon,app.ID,storeid,app.Name)
+		str+=fmt.Sprintf("<img src=\"%s\"  weight=\"44\" height=\"44\"/> <a target=\"_blank\" class=\"linkto\" href=\"/download?appid=%d&storeid=%d\"><font style=\"font-size:40px;vertical-align: top;\">%s</font></a>\n</p>\n",app.Icon,app.ID,storeid,app.Name)
 	}
 /*
 	str:="<img src=\"http://p2.img.cctvpic.com/nettv/newgame/cdn_pic/3212/mzl.fstobfap.png\"  weight=\"48\" height=\"48\"/> <a target=\"_blank\" class=\"linkto\" href=\"http://down2.uc.cn/amap/down.php?id=201&CustomID=C01110001449\"><font style=\"font-size:44px;vertical-align: top;\">高德地图</font></a>";
