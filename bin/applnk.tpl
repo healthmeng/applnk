@@ -10,7 +10,7 @@
 <body>
 <pre>
 <form>
-<font style="font-size:36px;vertical-align: top;color: red">{{.StoreName}}专用链接</font>
+<font style="font-size:16px;vertical-align: top;color: red">{{.StoreName}}专用链接</font>
 </p>
 {{ListApps .StoreID}}
 </p>
