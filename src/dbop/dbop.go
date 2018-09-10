@@ -159,7 +159,7 @@ func (info* TrackInfo)RegisterVisit() error{
 func ViewTracks() ([]string,error){
 	var vtime, name, app string
 	ret:=make ([]string, 0, 100)
-	query:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  order by tracks.visit";
+	query:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  order by tracks.visit desc";
 	res,err:=db.Query(query)
 	if err!=nil{
 		log.Println("Query quick view of visit tracks error",err)
