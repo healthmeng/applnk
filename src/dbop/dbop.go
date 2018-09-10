@@ -156,6 +156,26 @@ func (info* TrackInfo)RegisterVisit() error{
 	return nil
 }
 
+func ViewTracks() ([]string,error){
+	var vtime, name, app string
+	ret:=make ([]string, 0, 100)
+	query:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  order by tracks.visit";
+	res,err:=db.Query(query)
+	if err!=nil{
+		log.Println("Query quick view of visit tracks error",err)
+		return nil,err
+	}
+	for res.Next(){
+		if err:=res.Scan(&vtime,&name,&app);err!=nil{
+			log.Println ("Get object from result error:",err)
+			return nil,err
+		}else{
+			ret=append(ret,fmt.Sprintf("%s   %-20s  %s\n",vtime,name,app))
+		}
+	}
+	return ret,nil
+}
+
 func GetAllApps(storeid int64)([]*AppInfo,error){
 	if storeid<1000{
 		return nil,errors.New("Invalid storeid")

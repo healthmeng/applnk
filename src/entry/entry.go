@@ -301,6 +301,15 @@ func applnk(w http.ResponseWriter, r* http.Request){
     }
 }
 
+func quickview(w http.ResponseWriter, r *http.Request) {
+	ret,err:=dbop.ViewTracks()
+	if err==nil && ret!=nil{
+		for _,line:=range ret{
+			fmt.Fprintf(w,line)
+		}
+	}
+}
+
 func download(w http.ResponseWriter, r *http.Request) {
 	//http.Redirect(w, r, "http://storage.360buyimg.com/build-cms/V7.1.0.61272_T2_oem-szhuoyou16.apk",http.StatusFound)
 	r.ParseForm()
@@ -349,6 +358,7 @@ func main() {
 	http.HandleFunc("/",applnk)
 	http.HandleFunc("/applinks", applnk)
 	http.HandleFunc("/download",download);
+	http.HandleFunc("/quickview",quickview);
 	err := http.ListenAndServe(":8904", nil)
 	if err != nil {
 		fmt.Printf("Error:", err)
