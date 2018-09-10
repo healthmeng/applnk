@@ -304,6 +304,7 @@ func applnk(w http.ResponseWriter, r* http.Request){
 func quickview(w http.ResponseWriter, r *http.Request) {
 	ret,err:=dbop.ViewTracks()
 	if err==nil && ret!=nil{
+		fmt.Fprintf(w,"共 %d 条下载记录\n",len(ret));
 		for _,line:=range ret{
 			fmt.Fprintf(w,line)
 		}
