@@ -170,7 +170,7 @@ func ViewTracks() ([]string,error){
 			log.Println ("Get object from result error:",err)
 			return nil,err
 		}else{
-			ret=append(ret,fmt.Sprintf("%s   %-20s  %s\n",vtime,name,app))
+			ret=append(ret,fmt.Sprintf("%s   %s  %s\n",vtime,name,app))
 		}
 	}
 	return ret,nil
