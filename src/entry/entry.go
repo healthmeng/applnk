@@ -310,12 +310,11 @@ func quickview(w http.ResponseWriter, r *http.Request) {
 		args["To"]=fmt.Sprintf("%02d%02d%02d",tm.Year(),tm.Month(),tm.Day())
 		args["Store"]=""
 		args["App"]=""
-
+		args["Checked"]="checked"
 		ret,err:=dbop.ViewTracks()
 		if err==nil && ret!=nil{
 			args["Total"]=fmt.Sprintf("%d",len(ret))
 			t.Execute(w, args)
-//			fmt.Fprintf(w,"共 %d 条下载记录\n",len(ret));
 			for _,line:=range ret{
 				fmt.Fprintf(w,"%s<br>",line)
 			}
@@ -326,7 +325,8 @@ func quickview(w http.ResponseWriter, r *http.Request) {
         to:=strings.TrimSpace(r.Form["to"][0])
         store:=strings.TrimSpace(r.Form["store"][0])
         app:=strings.TrimSpace(r.Form["app"][0])
-		ret,err:=dbop.SearchMatch(from,to,store,app)
+		desc:=r.FormValue("sort")
+		ret,err:=dbop.SearchMatch(from,to,store,app,desc)
 		if err==nil && ret!=nil{
 	        t, _ := template.ParseFiles("qview.tpl")
 	        args:= make(map[string]string)
@@ -335,6 +335,11 @@ func quickview(w http.ResponseWriter, r *http.Request) {
 			args["To"]=to
 			args["Store"]=store
 			args["App"]=app
+			if desc=="desc"{
+				args["Checked"]="checked"
+			}else{
+				args["Checked"]="unchecked"
+			}
 			t.Execute(w, args)
 			for _,line:=range ret{
 				fmt.Fprintf(w,"%s<br>",line)

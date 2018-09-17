@@ -176,10 +176,10 @@ func ViewTracks() ([]string,error){
 	return ret,nil
 }
 
-func SearchMatch(from,to,store,app string)([]string,error){
+func SearchMatch(from,to,store,app,desc string)([]string,error){
 	var rvtime, rname, rapp string
 	ret:=make ([]string, 0, 100)
-	prequery:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  %s %s %s %s order by tracks.visit";
+	prequery:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  %s %s %s %s order by tracks.visit %s";
 	qfrom:=""
 	qto:=""
 	qstore:=""
@@ -196,7 +196,7 @@ func SearchMatch(from,to,store,app string)([]string,error){
 	if app!=""{
 		qapp=fmt.Sprintf("and apps.name like '%%%s%%'",app)
 	}
-	query:=fmt.Sprintf(prequery,qfrom,qto,qstore,qapp)
+	query:=fmt.Sprintf(prequery,qfrom,qto,qstore,qapp,desc)
 	res,err:=db.Query(query)
 	if err!=nil{
 		log.Println("Query quick view of visit tracks error",err)
