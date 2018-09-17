@@ -302,11 +302,43 @@ func applnk(w http.ResponseWriter, r* http.Request){
 }
 
 func quickview(w http.ResponseWriter, r *http.Request) {
-	ret,err:=dbop.ViewTracks()
-	if err==nil && ret!=nil{
-		fmt.Fprintf(w,"共 %d 条下载记录\n",len(ret));
-		for _,line:=range ret{
-			fmt.Fprintf(w,line)
+	if r.Method=="GET"{
+        t, _ := template.ParseFiles("qview.tpl")
+        args:= make(map[string]string)
+		args["From"]="20180101"
+		tm:=time.Now().Local()
+		args["To"]=fmt.Sprintf("%02d%02d%02d",tm.Year(),tm.Month(),tm.Day())
+		args["Store"]=""
+		args["App"]=""
+
+		ret,err:=dbop.ViewTracks()
+		if err==nil && ret!=nil{
+			args["Total"]=fmt.Sprintf("%d",len(ret))
+			t.Execute(w, args)
+//			fmt.Fprintf(w,"共 %d 条下载记录\n",len(ret));
+			for _,line:=range ret{
+				fmt.Fprintf(w,"%s<br>",line)
+			}
+		}
+	}else{
+		r.ParseForm()
+        from := strings.TrimSpace(r.Form["from"][0])
+        to:=strings.TrimSpace(r.Form["to"][0])
+        store:=strings.TrimSpace(r.Form["store"][0])
+        app:=strings.TrimSpace(r.Form["app"][0])
+		ret,err:=dbop.SearchMatch(from,to,store,app)
+		if err==nil && ret!=nil{
+	        t, _ := template.ParseFiles("qview.tpl")
+	        args:= make(map[string]string)
+			args["Total"]=fmt.Sprintf("%d",len(ret))
+			args["From"]=from
+			args["To"]=to
+			args["Store"]=store
+			args["App"]=app
+			t.Execute(w, args)
+			for _,line:=range ret{
+				fmt.Fprintf(w,"%s<br>",line)
+			}
 		}
 	}
 }

@@ -170,7 +170,44 @@ func ViewTracks() ([]string,error){
 			log.Println ("Get object from result error:",err)
 			return nil,err
 		}else{
-			ret=append(ret,fmt.Sprintf("%s   %s  %s\n",vtime,name,app))
+			ret=append(ret,fmt.Sprintf("%s   %s  %s",vtime,name,app))
+		}
+	}
+	return ret,nil
+}
+
+func SearchMatch(from,to,store,app string)([]string,error){
+	var rvtime, rname, rapp string
+	ret:=make ([]string, 0, 100)
+	prequery:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  %s %s %s %s order by tracks.visit";
+	qfrom:=""
+	qto:=""
+	qstore:=""
+	qapp:=""
+	if from!=""{
+		qfrom="and tracks.visit>="+from
+	}
+	if to!=""{
+		qto=fmt.Sprintf("and tracks.visit<DATE_ADD(\"%s\",INTERVAL 1 DAY)",to)
+	}
+	if store!=""{
+		qstore=fmt.Sprintf("and stores.name like '%%%s%%'",store)
+	}
+	if app!=""{
+		qapp=fmt.Sprintf("and apps.name like '%%%s%%'",app)
+	}
+	query:=fmt.Sprintf(prequery,qfrom,qto,qstore,qapp)
+	res,err:=db.Query(query)
+	if err!=nil{
+		log.Println("Query quick view of visit tracks error",err)
+		return nil,err
+	}
+	for res.Next(){
+		if err:=res.Scan(&rvtime,&rname,&rapp);err!=nil{
+			log.Println ("Get object from result error:",err)
+			return nil,err
+		}else{
+			ret=append(ret,fmt.Sprintf("%s   %s  %s",rvtime,rname,rapp))
 		}
 	}
 	return ret,nil
