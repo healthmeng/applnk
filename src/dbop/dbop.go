@@ -218,7 +218,7 @@ func GetAllApps(storeid int64)([]*AppInfo,error){
 		return nil,errors.New("Invalid storeid")
 	}
 	ret:=make([]*AppInfo,0,50)
-	query:="select * from apps"
+	query:="select * from apps order by online desc, id desc"
 	res,err:=db.Query(query)
 	if err!=nil{
 		log.Println("Query all apps error:",err)

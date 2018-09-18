@@ -66,6 +66,7 @@ func LoadPrices(sel string)([]*GoodsInfo, int){
 	}
 	return ret,selprice
 }
+
 func xdinfo(w http.ResponseWriter, r *http.Request) {
 
 	ck,_:=r.Cookie("logname")
@@ -261,14 +262,44 @@ func ListApps(storeid int64) interface{}{
 	str:=""
 	applist,_:=dbop.GetAllApps(storeid)
 	for _,app:=range applist{
-		str+=fmt.Sprintf("<img src=\"%s\"  weight=\"44\" height=\"44\"/> <a target=\"_blank\" class=\"linkto\" href=\"/download?appid=%d&storeid=%d\"><font style=\"font-size:40px;vertical-align: top;\">%s</font></a>\n</p>\n",app.Icon,app.ID,storeid,app.Name)
+		if app.Online>0{
+			str+=fmt.Sprintf("<img src=\"%s\"  weight=\"44\" height=\"44\"/> <a target=\"_blank\" class=\"linkto\" href=\"/download?appid=%d&storeid=%d\"><font style=\"font-size:40px;vertical-align: top;\">%s</font></a>\n</p>\n",app.Icon,app.ID,storeid,app.Name)
+		}
 	}
-/*
-	str:="<img src=\"http://p2.img.cctvpic.com/nettv/newgame/cdn_pic/3212/mzl.fstobfap.png\"  weight=\"48\" height=\"48\"/> <a target=\"_blank\" class=\"linkto\" href=\"http://down2.uc.cn/amap/down.php?id=201&CustomID=C01110001449\"><font style=\"font-size:44px;vertical-align: top;\">高德地图</font></a>";
-//	str+=fmt.Sprintf("%d",id)
-	id=1*/
 
 	return template.HTML(str)
+}
+
+func AppEdit() interface{}{
+	applist,_:=dbop.GetAllApps(0xffff) // Manager
+	str:=""
+	for _,app:=range applist{
+		online:="上线"
+		if app.Online==0{
+			online="下线"
+		}
+		str+=fmt.Sprintf("<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly /> <a target=\"_blank\" class=\"linkto\" href=\"%s\">下载链接</a>  状态:%s  <input type=\"button\" value=\"编辑详情\" onclick=\"oneditapp('%s',%d)\" /> <br>\n",app.ID, app.Name, app.Url,online,app.Name,app.ID)
+		//str+=fmt.Sprintf("ID:%-3d名称:<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly />  <a target=\"_blank\" class=\"linkto\" href=\"%s\">链接</a> 状态:<select><option galue=\"online\" %s>上线</option><option value=\"offline\" %s>下线</option></select><br>\n",app.ID,app.ID,app.Name,app.Url,online,offline)
+	}
+	return template.HTML(str)
+}
+
+func appmgr(w http.ResponseWriter, r* http.Request){
+	if r.Method=="GET"{
+			tpfunc:=make(template.FuncMap)
+			tpfunc["AppEdit"]=AppEdit
+			t:=template.New("appmgr.tpl")
+			t=t.Funcs(tpfunc)
+			t, err:= t.ParseFiles("appmgr.tpl")
+			if err!=nil{
+				panic(err)
+			}
+			t.Execute(w, nil)
+	}else{
+        r.ParseForm()
+        id:=r.Form["editid"][0]
+		fmt.Fprintf(w,"Edit id %s\n",id)
+	}
 }
 
 func applnk(w http.ResponseWriter, r* http.Request){
@@ -395,6 +426,7 @@ func logon(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/",applnk)
 	http.HandleFunc("/applinks", applnk)
+	http.HandleFunc("/appmgr", appmgr)
 	http.HandleFunc("/download",download);
 	http.HandleFunc("/quickview",quickview);
 	err := http.ListenAndServe(":8904", nil)
