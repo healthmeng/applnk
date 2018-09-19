@@ -9,9 +9,14 @@
 <script type="text/javascript">
 function oneditapp(name,id)
 {
-    alert(name+"ID:"+id);
+  /*  alert(name+"ID:"+id);
     document.forms["appmgr"].editid.value=id;
     document.forms["appmgr"].submit();
+*/
+	var s=showModalDialog("/appmgr/editapp",id,"dialogwidth:260px;dialogheight:240px");
+	if (s==1){
+		window.location.reload(true); 
+	}
 }
 </script>
 </head>

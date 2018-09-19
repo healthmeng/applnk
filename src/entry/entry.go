@@ -279,26 +279,35 @@ func AppEdit() interface{}{
 			online="下线"
 		}
 		str+=fmt.Sprintf("<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly /> <a target=\"_blank\" class=\"linkto\" href=\"%s\">下载链接</a>  状态:%s  <input type=\"button\" value=\"编辑详情\" onclick=\"oneditapp('%s',%d)\" /> <br>\n",app.ID, app.Name, app.Url,online,app.Name,app.ID)
-		//str+=fmt.Sprintf("ID:%-3d名称:<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly />  <a target=\"_blank\" class=\"linkto\" href=\"%s\">链接</a> 状态:<select><option galue=\"online\" %s>上线</option><option value=\"offline\" %s>下线</option></select><br>\n",app.ID,app.ID,app.Name,app.Url,online,offline)
+		//str+=fmt.Sprintf("ID:%-3d名称:<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly />  <a target=\"_blank\" class=\"linkto\" href=\"%s\">链接</a> 状态:<select><option value=\"online\" %s>上线</option><option value=\"offline\" %s>下线</option></select><br>\n",app.ID,app.ID,app.Name,app.Url,online,offline)
 	}
 	return template.HTML(str)
 }
 
 func appmgr(w http.ResponseWriter, r* http.Request){
-	if r.Method=="GET"{
-			tpfunc:=make(template.FuncMap)
-			tpfunc["AppEdit"]=AppEdit
-			t:=template.New("appmgr.tpl")
-			t=t.Funcs(tpfunc)
-			t, err:= t.ParseFiles("appmgr.tpl")
-			if err!=nil{
-				panic(err)
-			}
+	if r.URL.Path=="/appmgr/"{
+		if r.Method=="GET"{
+				tpfunc:=make(template.FuncMap)
+				tpfunc["AppEdit"]=AppEdit
+				t:=template.New("appmgr.tpl")
+				t=t.Funcs(tpfunc)
+				t, err:= t.ParseFiles("appmgr.tpl")
+				if err!=nil{
+					panic(err)
+				}
+				t.Execute(w, nil)
+		}else{
+	        r.ParseForm()
+	        id:=r.Form["editid"][0]
+			fmt.Fprintf(w,"Edit id %s\n",id)
+		}
+	}else if r.URL.Path=="/appmgr/editapp"{
+		if r.Method=="GET"{
+			t, _ := template.ParseFiles("editapp.tpl")
 			t.Execute(w, nil)
-	}else{
-        r.ParseForm()
-        id:=r.Form["editid"][0]
-		fmt.Fprintf(w,"Edit id %s\n",id)
+		}else{
+			fmt.Println("submitted: ",r.URL.Path)
+		}
 	}
 }
 
@@ -426,7 +435,7 @@ func logon(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/",applnk)
 	http.HandleFunc("/applinks", applnk)
-	http.HandleFunc("/appmgr", appmgr)
+	http.HandleFunc("/appmgr/", appmgr)
 	http.HandleFunc("/download",download);
 	http.HandleFunc("/quickview",quickview);
 	err := http.ListenAndServe(":8904", nil)
