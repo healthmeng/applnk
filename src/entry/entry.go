@@ -278,7 +278,7 @@ func AppEdit() interface{}{
 		if app.Online==0{
 			online="下线"
 		}
-		str+=fmt.Sprintf("<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly /> <a target=\"_blank\" class=\"linkto\" href=\"%s\">下载链接</a>  状态:%s  <input type=\"button\" value=\"编辑详情\" onclick=\"oneditapp('%s',%d)\" /> <br>\n",app.ID, app.Name, app.Url,online,app.Name,app.ID)
+		str+=fmt.Sprintf("<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly /> <a target=\"_blank\" class=\"linkto\" href=\"%s\">链接</a>  状态:%s  <input type=\"button\" value=\"编辑\" onclick=\"oneditapp('%s',%d)\" /> <input type=\"button\" value=\"删除\" onclick=\"ondelapp('%s',%d)\" /><br>\n",app.ID, app.Name, app.Url,online,app.Name,app.ID,app.Name,app.ID)
 		//str+=fmt.Sprintf("ID:%-3d名称:<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly />  <a target=\"_blank\" class=\"linkto\" href=\"%s\">链接</a> 状态:<select><option value=\"online\" %s>上线</option><option value=\"offline\" %s>下线</option></select><br>\n",app.ID,app.ID,app.Name,app.Url,online,offline)
 	}
 	return template.HTML(str)
@@ -306,8 +306,19 @@ func appmgr(w http.ResponseWriter, r* http.Request){
 			t, _ := template.ParseFiles("editapp.tpl")
 			t.Execute(w, nil)
 		}else{
-			fmt.Println("submitted: ",r.URL.Path)
+			fmt.Println("submitted: ",r.URL.Path) // update database, to be done
 		}
+	}else if r.URL.Path=="/appmgr/delapp"{
+		fmt.Println("delapp: ",r.URL.Path) // update database, to be done
+		r.ParseForm()
+		appstr:=r.Form.Get("appid")
+		if appstr!=""{
+			if appid,err:=strconv.ParseInt(appstr,10,64);err!=nil{
+				dbop.DelApp(appid)
+			}
+		}
+		fmt.Println("redirected")
+		http.Redirect(w,r,"/appmgr/",http.StatusFound);
 	}
 }
 

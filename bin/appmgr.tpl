@@ -18,6 +18,15 @@ function oneditapp(name,id)
 		window.location.reload(true); 
 	}
 }
+
+function ondelapp(name,id)
+{
+    var ret=confirm("确定要删除应用\""+name+"\"的所有信息吗？\n(如果不希望应用出现在下载列表中，可以暂时通过让该应用下线来实现)");
+    if (ret==true){
+       	window.location.href="/appmgr/delapp?appid="+id;
+    }
+}
+
 </script>
 </head>
 <body>

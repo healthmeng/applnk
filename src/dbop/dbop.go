@@ -125,6 +125,13 @@ func FindStoreID(id int64) (* StoreInfo,error){
 	return nil,nil
 }
 
+func DelApp(id int64) error{
+//	query:=fmt.Sprintf("delete from apps where id='%d'",id)
+//	_,err:=db.Query(query)
+//	return err
+	return nil;
+}
+
 func FindApp(id int64) (* AppInfo,error){
 	query:=fmt.Sprintf("select * from apps where id='%d'",id)
 	res,err:=db.Query(query)
