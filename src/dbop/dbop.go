@@ -41,28 +41,28 @@ type TrackInfo struct{
 
 func init(){
 	var err error
-	db,err=sql.Open("mysql","applnk:2huoyige@tcp(123.206.55.31:3306)/applnk")
+	db,err=sql.Open("mysql","applnk:2huoyige@tcp(123.206.55.31:3306)/test_applnk")
 	if err!=nil{
 		log.Println("Open database error:",err)
 		os.Exit(1)
 	}
 }
-/*
 
-func (info* UserInfo)SaveInfo() error{
-	dbinfo,_:=FindUser(info.Username)
+
+func (info* AppInfo)SaveInfo() error{
+/*	dbinfo,_:=FindApp(info.ID)
 	if dbinfo!=nil{
 	}else{
-		return errors.New("SaveInfo: user not found")
-	}
-	query:=fmt.Sprintf("update users set pwsha256='%s,descr='%s',face='%s',phone='%s' where uid=%d",info.Password,info.Descr,info.Face,info.Phone,info.UID)
+		return errors.New("SaveInfo: app not found")
+	}*/
+	query:=fmt.Sprintf("update apps set name='%s',url='%s',icon='%s',online='%d' where id=%d",info.Name,info.Url,info.Icon,info.Online,info.ID)
 	if _,err:=db.Exec(query);err!=nil{
-		log.Println("Update db error:",err)
+		fmt.Println("Update db error:",err)
 		return err
 	}
 	return nil
 }
-
+/*
 func FindStoreName(username string) ([]* StoreInfo,error){
 	query:=fmt.Sprintf("select * from users where username='%s'",username)
 	res,err:=db.Query(query)
@@ -225,7 +225,7 @@ func GetAllApps(storeid int64)([]*AppInfo,error){
 		return nil,errors.New("Invalid storeid")
 	}
 	ret:=make([]*AppInfo,0,50)
-	query:="select * from apps order by online desc, id desc"
+	query:="select * from apps order by online desc, id asc"
 	res,err:=db.Query(query)
 	if err!=nil{
 		log.Println("Query all apps error:",err)

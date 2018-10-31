@@ -13,7 +13,7 @@ function oneditapp(name,id)
     document.forms["appmgr"].editid.value=id;
     document.forms["appmgr"].submit();
 */
-	var s=showModalDialog("/appmgr/editapp",id,"dialogwidth:260px;dialogheight:240px");
+	var s=window.showModalDialog("/appmgr/editapp?appid="+id,id,"dialogwidth:260px;dialogheight:240px;resizable:no");
 	if (s==1){
 		window.location.reload(true); 
 	}

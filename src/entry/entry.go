@@ -303,17 +303,53 @@ func appmgr(w http.ResponseWriter, r* http.Request){
 		}
 	}else if r.URL.Path=="/appmgr/editapp"{
 		if r.Method=="GET"{
+			r.ParseForm()
+			appstr:=r.Form.Get("appid")
 			t, _ := template.ParseFiles("editapp.tpl")
-			t.Execute(w, nil)
+	        args:= make(map[string]string)
+			if appstr!=""{
+				if appid,err:=strconv.ParseInt(appstr,10,64);err==nil{
+					if appInfo,err:=dbop.FindApp(appid);err==nil{
+						args["APPNAME"]=appInfo.Name
+						args["APPURL"]=appInfo.Url
+						args["APPICON"]=appInfo.Icon
+						if appInfo.Online==0{
+							args["SELON"]=""
+							args["SELOFF"]="selected"
+						}else{
+							args["SELON"]="selected"
+							args["SELOFF"]=""
+						}
+					}
+				}
+			}
+			t.Execute(w, args)
 		}else{
-			fmt.Println("submitted: ",r.URL.Path) // update database, to be done
+		//	fmt.Println("submitted: ",r.URL.Path) // update database, to be done
+			r.ParseForm()
+			idstr:=r.Form["editid"][0]
+			if editid,err:=strconv.ParseInt(idstr,10,64);err==nil{
+				if info,err:=dbop.FindApp(editid);err==nil{
+					info.Name=r.Form["appname"][0]
+					info.Url=r.Form["appurl"][0]
+					info.Icon=r.Form["appicon"][0]
+					if r.Form.Get("status")=="online"{
+						info.Online=1
+					}else{
+						info.Online=0
+					}
+					if err:=info.SaveInfo();err==nil{
+						http.Redirect(w,r,"/appmgr/",http.StatusFound);
+					}
+				}
+			}
 		}
 	}else if r.URL.Path=="/appmgr/delapp"{
 		fmt.Println("delapp: ",r.URL.Path) // update database, to be done
 		r.ParseForm()
 		appstr:=r.Form.Get("appid")
 		if appstr!=""{
-			if appid,err:=strconv.ParseInt(appstr,10,64);err!=nil{
+			if appid,err:=strconv.ParseInt(appstr,10,64);err==nil{
 				dbop.DelApp(appid)
 			}
 		}

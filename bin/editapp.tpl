@@ -28,13 +28,13 @@ function onok(){
 <form name="editapp" action="/appmgr/editapp" method="post">
 <font style="font-size:20px;vertical-align: top;color: blue">应用详情</font>
 </p>
-编号&emsp;<input type="text" name="appid" id="appid" readonly>
-名称&emsp;<input type="text" name="appname">
-链接&emsp;<input type="text" name="appurl">
-图标&emsp;<input type="text" name="appicon">
-状态&emsp;<select>
-<option value="online" selected>上线</option>
-<option value="offline">下线</option>
+编号&emsp;<input type="text" name="appid" id="appid" readonly />
+名称&emsp;<input type="text" name="appname" value={{.APPNAME}} />
+链接&emsp;<input type="text" name="appurl" value={{.APPURL}} />
+图标&emsp;<input type="text" name="appicon" value={{.APPICON}} />
+状态&emsp;<select name="status">
+<option value="online" {{.SELON}} >上线</option>
+<option value="offline" {{.SELOFF}} >下线</option>
 </select>
 </p>
 <div style="text-align:center">
