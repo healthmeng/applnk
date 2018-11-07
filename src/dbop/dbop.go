@@ -50,11 +50,6 @@ func init(){
 
 
 func (info* AppInfo)SaveInfo() error{
-/*	dbinfo,_:=FindApp(info.ID)
-	if dbinfo!=nil{
-	}else{
-		return errors.New("SaveInfo: app not found")
-	}*/
 	query:=fmt.Sprintf("update apps set name='%s',url='%s',icon='%s',online='%d' where id=%d",info.Name,info.Url,info.Icon,info.Online,info.ID)
 	if _,err:=db.Exec(query);err!=nil{
 		fmt.Println("Update db error:",err)
