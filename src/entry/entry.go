@@ -33,6 +33,8 @@ type Store struct{
 	StoreID int64
 }
 
+var fhandle http.Handler
+
 func LoadPrices(sel string)([]*GoodsInfo, int){
 	ret:=make ([]* GoodsInfo,0,100)
 	selprice:=0
@@ -443,8 +445,18 @@ func logon(w http.ResponseWriter, r *http.Request) {
 	}*/
 }
 
+func codes(w http.ResponseWriter, r* http.Request){
+/*    h:=w.Header()
+    h.Add("Pragma","no-cache")
+    h.Add("Cache-Control","no-cache")
+*/
+    fhandle.ServeHTTP(w,r)
+}
+
 func main() {
 	http.HandleFunc("/",applnk)
+	fhandle=http:.StripPrefix("/localapp/",http.FileServer(http.Dir(os.Getenv("PWD"))))
+	http.HandleFunc("/localapp/",localapp)
 	http.HandleFunc("/applinks", applnk)
 	http.HandleFunc("/appmgr/", appmgr)
 	http.HandleFunc("/download",download);
