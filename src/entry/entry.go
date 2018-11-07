@@ -445,17 +445,18 @@ func logon(w http.ResponseWriter, r *http.Request) {
 	}*/
 }
 
-func codes(w http.ResponseWriter, r* http.Request){
-/*    h:=w.Header()
+func localapp(w http.ResponseWriter, r* http.Request){
+    h:=w.Header()
     h.Add("Pragma","no-cache")
     h.Add("Cache-Control","no-cache")
-*/
+
     fhandle.ServeHTTP(w,r)
 }
 
 func main() {
 	http.HandleFunc("/",applnk)
-	fhandle=http:.StripPrefix("/localapp/",http.FileServer(http.Dir(os.Getenv("PWD"))))
+	rootdir:=os.Getenv("PWD")+"/localapp"
+	fhandle=http.StripPrefix("/localapp/",http.FileServer(http.Dir(rootdir)))
 	http.HandleFunc("/localapp/",localapp)
 	http.HandleFunc("/applinks", applnk)
 	http.HandleFunc("/appmgr/", appmgr)
