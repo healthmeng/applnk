@@ -15,7 +15,7 @@ function oneditapp(name,id)
 */
 	var s=window.showModalDialog("/appmgr/editapp?appid="+id,id,"dialogwidth:260px;dialogheight:240px;resizable:no");
 	if (s==1){
-		window.location.reload(true); 
+		window.location.reload();
 	}
 }
 
