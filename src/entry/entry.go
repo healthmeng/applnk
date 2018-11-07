@@ -29,11 +29,20 @@ type Store struct {
 	StoreName string
 	StoreID   int64
 }
+
 /*
 func LoadPrices(sel string) ([]*GoodsInfo, int) {
 	ret := make([]*GoodsInfo, 0, 100)
 	selprice := 0
 	if file, err := os.Open("prices.dat"); err == nil {
+=======
+
+var fhandle http.Handler
+
+func LoadPrices(sel string)([]*GoodsInfo, int){
+	ret:=make ([]* GoodsInfo,0,100)
+	selprice:=0
+	if file,err:=os.Open("prices.dat");err==nil{
 		defer file.Close()
 		rd := bufio.NewReader(file)
 		for {
@@ -368,7 +377,19 @@ func logon(w http.ResponseWriter, r *http.Request) {
 		}*/
 }
 
+func localapp(w http.ResponseWriter, r* http.Request){
+    h:=w.Header()
+    h.Add("Pragma","no-cache")
+    h.Add("Cache-Control","no-cache")
+
+    fhandle.ServeHTTP(w,r)
+}
+
 func main() {
+	http.HandleFunc("/",applnk)
+	rootdir:=os.Getenv("PWD")+"/localapp"
+	fhandle=http.StripPrefix("/localapp/",http.FileServer(http.Dir(rootdir)))
+	http.HandleFunc("/localapp/",localapp)
 	http.HandleFunc("/applinks", applnk)
 	http.HandleFunc("/appmgr", appmgr)
 	http.HandleFunc("/appmgr/editapp", editapp)
