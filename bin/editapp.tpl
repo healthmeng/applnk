@@ -17,9 +17,9 @@ function oncancel(){
 }
 
 function onok(){
-	window.returnValue=1;
-	document.forms["editapp"].submit();
-	window.close();
+//	window.returnValue=1;
+//	document.forms["editapp"].submit();
+//	window.close();
 }
 
 </script>
@@ -38,7 +38,7 @@ function onok(){
 </select>
 </p>
 <div style="text-align:center">
-<input type="button" value="取 消" onclick="oncancel()" />&emsp;<input type="button" value="确 定" onclick="onok()" />
+<input type="button" value="取 消" onclick="oncancel()" />&emsp;<input type="submit" value="确 定" onclick="onok()" />
 </div>
 <input type="hidden" id="editid" name="editid" />
 </form>

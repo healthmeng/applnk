@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"os"
 	"time"
 )
 
@@ -30,14 +31,14 @@ type Store struct {
 	StoreID   int64
 }
 
+var fhandle http.Handler
+
 /*
 func LoadPrices(sel string) ([]*GoodsInfo, int) {
 	ret := make([]*GoodsInfo, 0, 100)
 	selprice := 0
 	if file, err := os.Open("prices.dat"); err == nil {
-=======
 
-var fhandle http.Handler
 
 func LoadPrices(sel string)([]*GoodsInfo, int){
 	ret:=make ([]* GoodsInfo,0,100)
@@ -396,7 +397,6 @@ func main() {
 	http.HandleFunc("/appmgr/delapp", delapp)
 	http.HandleFunc("/download", download)
 	http.HandleFunc("/quickview", quickview)
-	http.HandleFunc("/", applnk)
 	err := http.ListenAndServe(":8904", nil)
 	if err != nil {
 		fmt.Printf("Error:", err)

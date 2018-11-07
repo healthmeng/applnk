@@ -6,7 +6,6 @@ import (
 "html/template"
 "net/http"
 "strconv"
-"time"
 )
 
 func AppEdit() interface{} {
@@ -18,7 +17,6 @@ func AppEdit() interface{} {
 			online = "下线"
 		}
 		str += fmt.Sprintf("<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly /> <a target=\"_blank\" class=\"linkto\" href=\"%s\">链接</a>  状态:%s  <input type=\"button\" value=\"编辑\" onclick=\"oneditapp('%s',%d)\" /> <input type=\"button\" value=\"删除\" onclick=\"ondelapp('%s',%d)\" /><br>\n", app.ID, app.Name, app.Url, online, app.Name, app.ID, app.Name, app.ID)
-	fmt.Println(app.Name+":"+online)
 		//str+=fmt.Sprintf("ID:%-3d名称:<input type=\"text\" name=\"app%d\" value=\"%s\" size=6 readonly />  <a target=\"_blank\" class=\"linkto\" href=\"%s\">链接</a> 状态:<select><option value=\"online\" %s>上线</option><option value=\"offline\" %s>下线</option></select><br>\n",app.ID,app.ID,app.Name,app.Url,online,offline)
 	}
 	return template.HTML(str)
@@ -80,8 +78,8 @@ func editapp(w http.ResponseWriter, r *http.Request) {
 				}
 				//info.SaveInfo()
 				if err := info.SaveInfo(); err == nil {
-					fmt.Println("Start sleep")
-					time.Sleep(time.Second*5)
+					t, _ := template.ParseFiles("editok.tpl")
+					t.Execute(w,nil)
 				//	http.Redirect(w, r, "/appmgr", http.StatusFound)
 				}
 
