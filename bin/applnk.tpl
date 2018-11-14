@@ -5,6 +5,16 @@
 <title>
 应用下载
 </title>
+<style> 
+	body{
+		height: 100%
+	}
+	body{
+		margin: 0
+ 		background-repeat: no-repeat;
+        background: #F0FFFF; 
+		}
+</style>
 <link href="http://static.fpwap.com/UploadFiles/article/hyzx/2014/11/24/1416813696377691.jpg" rel="shortcut icon">
 </head>
 <body>
