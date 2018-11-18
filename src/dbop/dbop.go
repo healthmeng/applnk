@@ -8,10 +8,10 @@ _"strings"
 "errors"
 "fmt"
 _"github.com/Go-SQL-Driver/MySQL"
-_"time"
+"time"
 )
 
-var db *sql.DB
+var curdb *sql.DB
 
 type AppInfo struct{
 	ID int64
@@ -40,13 +40,27 @@ type TrackInfo struct{
 }
 
 func init(){
+	ConnDB()
+}
+
+func ConnDB(){
 	var err error
-	db,err=sql.Open("mysql","applnk:2huoyige@tcp(123.206.55.31:3306)/applnk")
+	curdb,err=sql.Open("mysql","applnk:2huoyige@tcp(123.206.55.31:3306)/applnk")
 	if err!=nil{
 		log.Println("Open database error:",err)
 		os.Exit(1)
 	}
+	curdb.SetConnMaxLifetime(time.Second*500)
 }
+
+func GetDB() *sql.DB{
+	if err:=curdb.Ping();err!=nil{
+		curdb.Close()
+		ConnDB()
+	}
+	return curdb
+}
+
 /*
 
 func (info* UserInfo)SaveInfo() error{
@@ -107,6 +121,7 @@ func ListUsers()([]*UserInfo,error){
 }*/
 
 func FindStoreID(id int64) (* StoreInfo,error){
+	db:=GetDB()
 	query:=fmt.Sprintf("select * from stores where id='%d'",id)
 	res,err:=db.Query(query)
 	if err!=nil{
@@ -133,6 +148,7 @@ func DelApp(id int64) error{
 }
 
 func FindApp(id int64) (* AppInfo,error){
+	db:=GetDB()
 	query:=fmt.Sprintf("select * from apps where id='%d'",id)
 	res,err:=db.Query(query)
 	if err!=nil{
@@ -153,6 +169,7 @@ func FindApp(id int64) (* AppInfo,error){
 }
 
 func (info* TrackInfo)RegisterVisit() error{
+	db:=GetDB()
 /*    tm:=time.Now().Local()
     info.RegTime=fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tm.Year(), tm.Month(), tm.Day(), tm.Hour(), tm.Minute(), tm.Second())*/
     query:=fmt.Sprintf("insert into tracks (storeid, appid) values (%d,%d)",info.StoreID,info.AppID)
@@ -164,6 +181,7 @@ func (info* TrackInfo)RegisterVisit() error{
 }
 
 func ViewTracks() ([]string,error){
+	db:=GetDB()
 	var vtime, name, app string
 	ret:=make ([]string, 0, 100)
 	query:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  order by tracks.visit desc";
@@ -184,6 +202,7 @@ func ViewTracks() ([]string,error){
 }
 
 func SearchMatch(from,to,store,app,desc string)([]string,error){
+	db:=GetDB()
 	var rvtime, rname, rapp string
 	ret:=make ([]string, 0, 100)
 	prequery:="select tracks.visit,stores.name,apps.name from tracks,stores,apps where tracks.storeid=stores.id and tracks.appid=apps.id  %s %s %s %s order by tracks.visit %s";
@@ -221,6 +240,7 @@ func SearchMatch(from,to,store,app,desc string)([]string,error){
 }
 
 func GetAllApps(storeid int64)([]*AppInfo,error){
+	db:=GetDB()
 	if storeid<1000{
 		return nil,errors.New("Invalid storeid")
 	}
