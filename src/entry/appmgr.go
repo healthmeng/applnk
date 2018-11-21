@@ -40,7 +40,33 @@ func appmgr(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func addapp(w http.ResponseWriter, r *http.Request) {
+fmt.Println("addapp: ",r.Method)
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("addapp.tpl")
+		args := make(map[string]string)
+		args["APPNAME"] =""
+		args["APPURL"] ="" 
+		args["APPICON"] ="" 
+		args["SELON"] = "selected"
+		t.Execute(w, args)
+	} else {
+		r.ParseForm()
+		info:=&dbop.AppInfo {
+				Name:r.Form["appname"][0],
+				Url:r.Form["appurl"][0],
+				Icon:r.Form["appicon"][0],
+				Online:1 }
+		if err := info.Insert(); err == nil {
+			t, _ := template.ParseFiles("editok.tpl")
+			t.Execute(w,nil)
+		}
+
+	}
+}
+
 func editapp(w http.ResponseWriter, r *http.Request) {
+fmt.Println("editapp: ",r.Method)
 	if r.Method == "GET" {
 		r.ParseForm()
 		appstr := r.Form.Get("appid")

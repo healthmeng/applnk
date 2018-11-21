@@ -51,8 +51,18 @@ func init(){
 
 func (info* AppInfo)SaveInfo() error{
 	query:=fmt.Sprintf("update apps set name='%s',url='%s',icon='%s',online='%d' where id=%d",info.Name,info.Url,info.Icon,info.Online,info.ID)
+fmt.Println("Starting insert:",query)
 	if _,err:=db.Exec(query);err!=nil{
 		fmt.Println("Update db error:",err)
+		return err
+	}
+	return nil
+}
+
+func (info* AppInfo)Insert() error{
+	query:=fmt.Sprintf("insert into apps (name,url,icon,online) value (\"%s\", \"%s\",\"%s\",%d)",info.Name,info.Url,info.Icon,info.Online)
+	if _,err:=db.Exec(query);err!=nil{
+		fmt.Println("insert db error:",err)
 		return err
 	}
 	return nil
@@ -121,10 +131,9 @@ func FindStoreID(id int64) (* StoreInfo,error){
 }
 
 func DelApp(id int64) error{
-//	query:=fmt.Sprintf("delete from apps where id='%d'",id)
-//	_,err:=db.Query(query)
-//	return err
-	return nil;
+	query:=fmt.Sprintf("delete from apps where id='%d'",id)
+	_,err:=db.Query(query)
+	return err
 }
 
 func FindApp(id int64) (* AppInfo,error){

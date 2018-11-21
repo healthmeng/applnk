@@ -394,6 +394,7 @@ func main() {
 	http.HandleFunc("/applinks", applnk)
 	http.HandleFunc("/appmgr", appmgr)
 	http.HandleFunc("/appmgr/editapp", editapp)
+	http.HandleFunc("/appmgr/addapp", addapp)
 	http.HandleFunc("/appmgr/delapp", delapp)
 	http.HandleFunc("/download", download)
 	http.HandleFunc("/quickview", quickview)

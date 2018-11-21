@@ -32,23 +32,26 @@ function onok(){
 	if(appname=="" || appname==null){
 //		alert("1");
 		alert("应用名称为空");
-		return false;
+		return ;
 	}
 	if(url=="" || url==null){
 		alert("下载地址为空");
-		return false;
+		return ;
 	}
 	var pwin = window.opener;
-	document.forms["editapp"].submit();
+	document.forms['addapp'].submit();
+//	addapp.submit();
+//	document.forms["addapp"].submit();
 	pwin.appmgr.retval.value="ok";
 	//pwin.ReloadList();
-	return true;
+	return; 
 }
 
 </script>
 </head>
 <body>
-<form name="editapp" action="/appmgr/editapp" method="post" onsubmit="return onok()">
+<form name="addapp" action="/appmgr/addapp" method="post">
+<!--onsubmit="return onok()"> -->
 <font style="font-size:20px;vertical-align: top;color: blue">应用详情</font>
 </p>
 编号&emsp;<input type="text" name="appid" id="appid" readonly /></p>
@@ -61,7 +64,7 @@ function onok(){
 </select>
 </p>
 <div style="text-align:center">
-<input type="button" value="取 消" onclick="oncancel()" />&emsp;<input type="submit" value="确 定" />
+<input type="button" value="取 消" onclick="oncancel()" />&emsp;<input type="button" value="确 定" onclick="onok()" />
 </div>
 <input type="hidden" id="editid" name="editid" />
 </form>
