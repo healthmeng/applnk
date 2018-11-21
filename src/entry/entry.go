@@ -288,18 +288,19 @@ func applnk(w http.ResponseWriter, r *http.Request) {
 }
 
 func quickview(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		t, _ := template.ParseFiles("qview.tpl")
-		args := make(map[string]string)
-		args["From"] = "20180101"
-		tm := time.Now().Local()
-		args["To"] = fmt.Sprintf("%02d%02d%02d", tm.Year(), tm.Month(), tm.Day())
-		args["Store"] = ""
-		args["App"] = ""
-		args["Checked"] = "checked"
-		ret, err := dbop.ViewTracks()
-		if err == nil && ret != nil {
-			args["Total"] = fmt.Sprintf("%d", len(ret))
+	if r.Method=="GET"{
+        t, _ := template.ParseFiles("qview.tpl")
+        args:= make(map[string]string)
+		tm:=time.Now().Local()
+		args["To"]=fmt.Sprintf("%02d%02d%02d",tm.Year(),tm.Month(),tm.Day())
+		args["From"]=args["To"]
+		args["Store"]=""
+		args["App"]=""
+		args["Checked"]="checked"
+//		ret,err:=dbop.ViewTracks()
+		ret,err:=dbop.SearchMatch(args["From"],args["To"],"","","desc")
+		if err==nil && ret!=nil{
+			args["Total"]=fmt.Sprintf("%d",len(ret))
 			t.Execute(w, args)
 			for _, line := range ret {
 				fmt.Fprintf(w, "%s<br>", line)

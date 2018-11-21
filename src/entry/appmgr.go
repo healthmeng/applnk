@@ -58,7 +58,7 @@ fmt.Println("addapp: ",r.Method)
 				Icon:r.Form["appicon"][0],
 				Online:1 }
 		if err := info.Insert(); err == nil {
-			t, _ := template.ParseFiles("editok.tpl")
+			t, _ := template.ParseFiles("addapp.tpl")
 			t.Execute(w,nil)
 		}
 
