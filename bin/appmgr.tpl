@@ -7,42 +7,84 @@
 </title>
 <link href="http://imgsrc.baidu.com/imgad/pic/item/f2deb48f8c5494ee4982ea3f26f5e0fe99257e70.jpg" rel="shortcut icon">
 <script type="text/javascript">
+
+var editwin;
+var timer;
+
 function oneditapp(name,id)
 {
+	if (editwin!=undefined && editwin.closed==false){
+		editwin.focus();
+		return;
+	}
+	editwin=window.open('/appmgr/editapp?editid='+id,'','modal=yes,depended=yes,z-look=yes,height=330,width=260,top=90,left=50,toolbar=no,menubar=no,scrollbars=yes,resizable=no,status=no');
+	timer = window.setInterval("IfWindowClosed()", 500);
+}
+
+window.onbeforeunload =function(){
+	if(editwin!=undefined && editwin.closed==false)
+		editwin.close();
+
   /*  alert(name+"ID:"+id);
     document.forms["appmgr"].editid.value=id;
     document.forms["appmgr"].submit();
 */
-	var s=window.showModalDialog("/appmgr/editapp?appid="+id,id,"dialogwidth:260px;dialogheight:305px;resizable:no");
+/*	var s=window.showModalDialog("/appmgr/editapp?appid="+id,id,"dialogwidth:260px;dialogheight:305px;resizable:no");
 	if (s==1){
 		window.location.reload(true);
-	}
+	}*/
 }
 
 function ondelapp(name,id)
 {
+	if (editwin!=undefined && editwin.closed==false){
+		editwin.focus();
+		return;
+	}
     var ret=confirm("确定要删除应用\""+name+"\"的所有信息吗？\n(如果不希望应用出现在下载列表中，可以暂时通过让该应用下线来实现)");
     if (ret==true){
        	window.location.href="/appmgr/delapp?appid="+id;
     }
 }
 
-var editwin;
-var timer;
+
+window.onfocus=function(){
+	if (editwin!=undefined && editwin.closed==false){
+		editwin.focus();
+	}
+}
+
+window.document.onfocus=function(){
+    if (editwin!=undefined && editwin.closed==false){
+        editwin.focus();
+    }
+}
+
+window.document.onclick=function(){
+    if (editwin!=undefined && editwin.closed==false){
+        editwin.focus();
+    }
+}
+
+window.document.ondblclick=function(){
+    if (editwin!=undefined && editwin.closed==false){
+        editwin.focus();
+    }
+}
 
 function addapp()
 {
-//    var s=window.showModalDialog("/appmgr/addapp","自动分配","dialogwidth:260px;dialogheight:305px;resizable:no");
 	if (editwin!=undefined && editwin.closed==false){
 		editwin.focus();
 		return;
 	}
-	editwin=window.open('/appmgr/addapp','','modal=yes,depended=yes,z-look=yes,height=330,width=260,top=70,left=50,toolbar=no,menubar=no,scrollbars=yes,resizable=no,status=no');
-	//window.open('/appmgr/addapp','自动分配','height=305,width=260,toolbar=no,menubar=no,scrollbars=yes,resizable=no,location=no,status=no');
-	//editwin=window.open('/appmgr/addapp?controlName=btnOpenCompleted&',"自动分配",'modal=yes,height=305,width=260,top='+(screen.height-305)/2+',left='+(screen.width-260)/2+',toolbar=no,menubar=no,scrollbars=yes,resizable=no,location=no,status=no');
-   // if (s==1)
-     //   window.location.reload();
-	timer = window.setInterval("IfWindowClosed()", 1000);
+	editwin=window.open('/appmgr/addapp','','modal=yes,depended=yes,z-look=yes,height=330,width=260,top=90,left=50,toolbar=no,menubar=no,scrollbars=yes,resizable=no,status=no');
+	timer = window.setInterval("IfWindowClosed()", 500);
+}
+
+window.onbeforeunload =function(){
+	if(editwin!=undefined && editwin.closed==false)
+		editwin.close();
 }
 
 function IfWindowClosed() {
@@ -53,10 +95,12 @@ function IfWindowClosed() {
   			window.clearInterval(timer);
 			editwin=undefined;
 			appmgr.retval.value=="";
+			window.location.reload(true);
 		}else{
 			if (appmgr.retval.value=="ok"){
   				window.clearInterval(timer);
 				editwin.close();
+				editwin=undefined;
 				appmgr.retval.value="";
 				window.location.reload(true);
 			}

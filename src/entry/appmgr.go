@@ -41,7 +41,6 @@ func appmgr(w http.ResponseWriter, r *http.Request) {
 }
 
 func addapp(w http.ResponseWriter, r *http.Request) {
-fmt.Println("addapp: ",r.Method)
 	if r.Method == "GET" {
 		t, _ := template.ParseFiles("addapp.tpl")
 		args := make(map[string]string)
@@ -49,6 +48,7 @@ fmt.Println("addapp: ",r.Method)
 		args["APPURL"] ="" 
 		args["APPICON"] ="" 
 		args["SELON"] = "selected"
+		args["APPID"]="自动分配"
 		t.Execute(w, args)
 	} else {
 		r.ParseForm()
@@ -66,18 +66,18 @@ fmt.Println("addapp: ",r.Method)
 }
 
 func editapp(w http.ResponseWriter, r *http.Request) {
-fmt.Println("editapp: ",r.Method)
 	if r.Method == "GET" {
 		r.ParseForm()
-		appstr := r.Form.Get("appid")
+		appidstr := r.Form.Get("editid")
 		t, _ := template.ParseFiles("editapp.tpl")
 		args := make(map[string]string)
-		if appstr != "" {
-			if appid, err := strconv.ParseInt(appstr, 10, 64); err == nil {
+		if appidstr != "" {
+			if appid, err := strconv.ParseInt(appidstr, 10, 64); err == nil {
 				if appInfo, err := dbop.FindApp(appid); err == nil {
 					args["APPNAME"] = appInfo.Name
 					args["APPURL"] = appInfo.Url
 					args["APPICON"] = appInfo.Icon
+					args["APPID"]=appidstr
 					if appInfo.Online == 0 {
 						args["SELON"] = ""
 						args["SELOFF"] = "selected"
@@ -91,7 +91,7 @@ fmt.Println("editapp: ",r.Method)
 		t.Execute(w, args)
 	} else {
 		r.ParseForm()
-		idstr := r.Form["editid"][0]
+		idstr := r.Form["appid"][0]
 		if editid, err := strconv.ParseInt(idstr, 10, 64); err == nil {
 			if info, err := dbop.FindApp(editid); err == nil {
 				info.Name = r.Form["appname"][0]
@@ -115,7 +115,6 @@ fmt.Println("editapp: ",r.Method)
 }
 
 func delapp(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("delapp: ", r.URL.Path) // update database, to be done
 	r.ParseForm()
 	appstr := r.Form.Get("appid")
 	if appstr != "" {
