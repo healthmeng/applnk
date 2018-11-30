@@ -364,8 +364,10 @@ func quickview(w http.ResponseWriter, r *http.Request) {
 		args["Store"]=""
 		args["App"]=""
 		args["Checked"]="checked"
+		args["Combined"]="checked"
+
 //		ret,err:=dbop.ViewTracks()
-		ret,err:=dbop.SearchMatch(args["From"],args["To"],"","","desc")
+		ret,err:=dbop.SearchMatch(args["From"],args["To"],"","","desc","combined")
 		if err==nil && ret!=nil{
 			args["Total"]=fmt.Sprintf("%d",len(ret))
 			t.Execute(w, args)
@@ -380,7 +382,8 @@ func quickview(w http.ResponseWriter, r *http.Request) {
         store:=strings.TrimSpace(r.Form["store"][0])
         app:=strings.TrimSpace(r.Form["app"][0])
 		desc:=r.FormValue("sort")
-		ret,err:=dbop.SearchMatch(from,to,store,app,desc)
+		combine:=r.FormValue("combine")
+		ret,err:=dbop.SearchMatch(from,to,store,app,desc,combine)
 		if err==nil && ret!=nil{
 	        t, _ := template.ParseFiles("qview.tpl")
 	        args:= make(map[string]string)
@@ -393,6 +396,11 @@ func quickview(w http.ResponseWriter, r *http.Request) {
 				args["Checked"]="checked"
 			}else{
 				args["Checked"]="unchecked"
+			}
+			if combine=="combined"{
+				args["Combined"]="checked"
+			}else{
+				args["Combined"]="unckecked"
 			}
 			t.Execute(w, args)
 			for _,line:=range ret{

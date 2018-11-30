@@ -4,6 +4,7 @@ import (
 "database/sql"
 _"strings"
 "log"
+"math"
 "os"
 "errors"
 "fmt"
@@ -201,7 +202,7 @@ func ViewTracks() ([]string,error){
 	return ret,nil
 }
 
-func SearchMatch(from,to,store,app,desc string)([]string,error){
+func SearchMatch(from,to,store,app,desc,combine string)([]string,error){
 	db:=GetDB()
 	var rvtime, rname, rapp string
 	ret:=make ([]string, 0, 100)
@@ -228,12 +229,27 @@ func SearchMatch(from,to,store,app,desc string)([]string,error){
 		log.Println("Query quick view of visit tracks error",err)
 		return nil,err
 	}
+	ltime,_:=time.Parse("2006-01-02 15:04:05","1970-01-01 01:00:00")
+	lname:=""
+	lapp:=""
 	for res.Next(){
 		if err:=res.Scan(&rvtime,&rname,&rapp);err!=nil{
 			log.Println ("Get object from result error:",err)
 			return nil,err
 		}else{
-			ret=append(ret,fmt.Sprintf("%s   %s  %s",rvtime,rname,rapp))
+			record:=true
+			if combine=="combined"{
+				curtime,_:=time.Parse("2006-01-02 15:04:05",rvtime)
+				if lname==rname && lapp==rapp && math.Abs(curtime.Sub(ltime).Seconds())<30{
+					record=false
+				}
+				ltime=curtime
+				lname=rname
+				lapp=rapp
+			}
+			if record{
+				ret=append(ret,fmt.Sprintf("%s   %s  %s",rvtime,rname,rapp))
+			}
 		}
 	}
 	return ret,nil
