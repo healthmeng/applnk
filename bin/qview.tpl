@@ -6,12 +6,11 @@
 </head>
 <body>
 <form action="/quickview" method="post">
-起始日期:&emsp;<input type="text" name="from" value="{{.From}}" /><br>
-结束日期:&emsp;<input type="text" name="to" value="{{.To}}" /><br>
-门店关键字:<input type="text" name="store" value="{{.Store}}" /><br>
-应用关键字:<input type="text" name="app" value="{{.App}}" /><br>
-智能合并<input name="combine" type="checkbox" value="combined" {{.Combined}} />&emsp;新记录在前<input name="sort" type="checkbox" value="desc" {{.Checked}} />&emsp;<input type="submit" value="搜索" /><hr />
-共 {{.Total}} 条下载记录
+前缀:<input type="text" name="prefix" value="{{.Prefix}}" /><br>
+后缀:<input type="text" name="suffix" value="{{.Suffix}}" /><br>
+表格内容:<br>
+<textarea name="excel" rows="20" cols="80">{{.Excel}}</textarea> <br>
+<input type="submit" value="转换" /><hr />
 </form>
 </body>
 </html>
