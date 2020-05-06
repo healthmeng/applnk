@@ -46,7 +46,8 @@ func quickview(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
         prefix:= strings.TrimSpace(r.Form["prefix"][0])
         suffix:=strings.TrimSpace(r.Form["suffix"][0])
-        excel:=strings.TrimSpace(r.Form["excel"][0])
+        excel:=r.Form["excel"][0]
+        //excel:=strings.TrimSpace(r.Form["excel"][0])
 		value:=ConvText(prefix,suffix,excel)
 //		if err==nil {
 	        t, _ := template.ParseFiles("qview.tpl")

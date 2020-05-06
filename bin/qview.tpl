@@ -9,8 +9,8 @@
 前缀:<input type="text" name="prefix" value="{{.Prefix}}" /><br>
 后缀:<input type="text" name="suffix" value="{{.Suffix}}" /><br>
 表格内容:<br>
-<textarea name="excel" rows="10" cols="30">{{.Excel}}</textarea> <br>
-<input type="submit" value="转换" /><hr />
+<textarea name="excel" rows="15" cols="40">{{.Excel}}</textarea> <br>
+<input type="submit" value="转换" />
 </form>
 </body>
 </html>
