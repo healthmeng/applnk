@@ -9,11 +9,14 @@ import (
 
 
 func ConvText(prefix,suffix,excel string)string{
-	strs:=strings.Split(excel,"\r\n")
+	strs:=strings.Split(excel,"\n")
 	ret:=""
 	all:=len(strs)
 	for l,line:=range strs{
-		ret+=prefix+line+suffix
+		line=strings.TrimSpace(strings.Trim(line,"\r"))
+		if line!=""{
+			ret+=prefix+line+suffix
+		}
 		if l<all-1{
 			ret+="\n"
 
