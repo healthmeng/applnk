@@ -15,7 +15,11 @@ func ConvText(prefix,suffix,excel string)string{
 	for l,line:=range strs{
 		line=strings.TrimSpace(strings.Trim(line,"\r"))
 		if line!=""{
-			ret+=prefix+line+suffix
+			if strings.HasPrefix(line,prefix) && strings.HasSuffix(line,suffix){
+				ret+=line
+			}else{
+				ret+=prefix+line+suffix
+			}
 		}
 		if l<all-1{
 			ret+="\n"
