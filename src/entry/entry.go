@@ -5,6 +5,9 @@ import (
 	"html/template"
 	"strings"
 	"net/http"
+	"os"
+	"bufio"
+	"log"
 )
 
 
@@ -61,9 +64,32 @@ func quickview(w http.ResponseWriter, r *http.Request) {
 			args["Excel"]=value
 			t.Execute(w, args)
 //			}
+		log.Printf("From: %s\n",r.RemoteAddr)
 	}
 }
 
+func ShowLog(w http.ResponseWriter, r *http.Request) {
+	if r.Method=="GET"{
+		r.ParseForm()
+		if r.Form.Get("clear")=="1"{
+			file,_:=os.Create("nohup.out")
+			file.Close()
+			
+		}else{
+			if file,err:=os.Open("nohup.out");err==nil{
+				defer file.Close()
+				rd:=bufio.NewReader(file)
+				for{
+					line,_,err:=rd.ReadLine()
+					if err!=nil{
+						break
+					}
+					fmt.Fprintln(w,string(line))
+				}
+			}
+		}
+	}
+}
 func main() {
 /*	http.HandleFunc("/",applnk)
 	rootdir:=os.Getenv("PWD")+"/localapp"
@@ -73,7 +99,8 @@ func main() {
 	http.HandleFunc("/appmgr/", appmgr)
 	http.HandleFunc("/download",download);*/
 	http.HandleFunc("/",quickview)
-//	http.HandleFunc("/quickview",quickview);
+	http.HandleFunc("/quickview",quickview)
+	http.HandleFunc("/log",ShowLog)
 	err := http.ListenAndServe(":8904", nil)
 	if err != nil {
 		fmt.Printf("Error:", err)
