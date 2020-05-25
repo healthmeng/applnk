@@ -74,7 +74,6 @@ func ShowLog(w http.ResponseWriter, r *http.Request) {
 		if r.Form.Get("clear")=="1"{
 			file,_:=os.Create("nohup.out")
 			file.Close()
-			
 		}else{
 			if file,err:=os.Open("nohup.out");err==nil{
 				defer file.Close()
@@ -91,13 +90,6 @@ func ShowLog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func main() {
-/*	http.HandleFunc("/",applnk)
-	rootdir:=os.Getenv("PWD")+"/localapp"
-	fhandle=http.StripPrefix("/localapp/",http.FileServer(http.Dir(rootdir)))
-	http.HandleFunc("/localapp/",localapp)
-	http.HandleFunc("/applinks", applnk)
-	http.HandleFunc("/appmgr/", appmgr)
-	http.HandleFunc("/download",download);*/
 	http.HandleFunc("/",quickview)
 	http.HandleFunc("/quickview",quickview)
 	http.HandleFunc("/log",ShowLog)

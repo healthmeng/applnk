@@ -52,6 +52,7 @@ func ConnDB(){
 		os.Exit(1)
 	}
 	curdb.SetConnMaxLifetime(time.Second*500)
+
 }
 
 func GetDB() *sql.DB{
